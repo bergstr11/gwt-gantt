@@ -19,6 +19,7 @@ package com.imaginedreal.gwtgantt.gantt;
 
 import java.util.Date;
 
+import com.google.gwt.user.client.Event;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.view.client.HasData;
 import com.google.gwt.view.client.SelectionModel;
@@ -106,4 +107,10 @@ public interface TaskDisplay<T> extends HasData<T>, IsWidget {
     
     boolean zoomOut();
     boolean zoomIn();
+
+    public void fireTaskOutEvent(T task, Event event);
+
+    public void fireTaskOverEvent(T task, Event event);
+
+    public void fireTaskClickEvent(T task, Event event);
 }

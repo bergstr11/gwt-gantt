@@ -21,8 +21,6 @@ package com.imaginedreal.gwtgantt;
 
 import java.util.Date;
 
-import com.google.gwt.core.client.GWT;
-
 /**
  *
  * @author Brad Rydzewski
@@ -93,7 +91,7 @@ public class DateUtil {
 			int startDateOffset = -(startDate.getTimezoneOffset() * 60 * 1000);
 			long startDateInstant = startDate.getTime() + startDateOffset;
 			double differenceDouble = (double) Math.abs(endDateInstant - startDateInstant) / (double) MILLIS_IN_A_DAY;
-			GWT.log("  differenceDouble: "+differenceDouble);
+         // GWT.log(" differenceDouble: "+differenceDouble);
 			differenceDouble = Math.max(1.0D, differenceDouble);
 			difference = (int) Math.round(differenceDouble);//added math.ceil .. then changed to floor... shit, which one???
 		}

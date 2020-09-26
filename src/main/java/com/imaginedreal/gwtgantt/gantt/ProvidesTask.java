@@ -18,12 +18,12 @@
 
 package com.imaginedreal.gwtgantt.gantt;
 
+import java.util.Date;
+import java.util.List;
+
 import com.imaginedreal.gwtgantt.model.DurationFormat;
 import com.imaginedreal.gwtgantt.model.Predecessor;
 import com.imaginedreal.gwtgantt.model.PredecessorType;
-
-import java.util.Date;
-import java.util.List;
 
 /**
  * <p>
@@ -49,20 +49,6 @@ public interface ProvidesTask<T> {
      * @return Task name.
      */
     public String getName(T item);
-
-    /**
-     * Gets the Text notes associated with the task.
-     *
-     * @return Task notes.
-     */
-    public String getNotes(T item);
-
-    /**
-     * Gets the Order of the task.
-     *
-     * @return Task order.
-     */
-    public int getOrder(T item);
 
     /**
      * Gets the indent Level of the task.

@@ -40,7 +40,7 @@ public interface TaskDisplayView<T> extends IsWidget {
  
     void setSelected(T item, boolean selected);
 
-    void renderTask(T item, Rectangle rectangle);
+    void renderTask(T item, int count, Rectangle rectangle);
 
     void renderTaskSummary(T item, Rectangle rectangle);
 

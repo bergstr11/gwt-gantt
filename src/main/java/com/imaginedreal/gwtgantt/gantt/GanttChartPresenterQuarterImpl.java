@@ -98,7 +98,7 @@ public class GanttChartPresenterQuarterImpl<T> extends GanttChartPresenter<T> {
 
         //render the task
         Rectangle taskBounds = new Rectangle(left, top, width, height);
-        view.renderTask(task, taskBounds);
+        view.renderTask(task, order, taskBounds);
 
         //render the label
         Rectangle labelBounds = new Rectangle(taskBounds.getRight(), top - 2, -1, -1);

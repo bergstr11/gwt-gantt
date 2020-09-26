@@ -36,7 +36,6 @@ import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Event;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -51,7 +50,8 @@ import com.imaginedreal.gwtgantt.widget.SVGPath;
  *
  * @author Brad Rydzewski
  */
-public class GanttChartView<T> extends Composite implements TaskDisplayView<T> {
+public class GanttChartView<T> extends Composite implements TaskDisplayView<T>
+{
 
 	interface Template extends SafeHtmlTemplates {
 		@Template("<div style=\"width: {0}px; left: {1}px; \"><div class=\"gwt-Label\">{2}</div></div>")
@@ -95,8 +95,7 @@ public class GanttChartView<T> extends Composite implements TaskDisplayView<T> {
             // No need for call to super.
             switch (DOM.eventGetType(event)) {
                 case Event.ONCLICK:
-//                    view.onItemClicked(task, new Point(
-//                            event.getClientX(), event.getClientY()));
+                   display.fireTaskClickEvent(task, event);
 
                 	if(display.getSelectionModel()!=null)
                 		display.getSelectionModel().setSelected(task, true);
@@ -113,13 +112,13 @@ public class GanttChartView<T> extends Composite implements TaskDisplayView<T> {
                     break;
 
                 case Event.ONMOUSEOVER:
+                   display.fireTaskOverEvent(task, event);
                 	doTaskEnter(task);
-//                    view.onItemMouseOver(task);
                     break;
 
                 case Event.ONMOUSEOUT:
                 	doTaskExit(task);
-//                    view.onItemMouseOut(task);
+                  display.fireTaskOutEvent(task, event);
                     break;
             }
             super.onBrowserEvent(event);
@@ -218,10 +217,24 @@ public class GanttChartView<T> extends Composite implements TaskDisplayView<T> {
     }
 
     @Override
-    public void renderTask(T task, Rectangle bounds) {
+    public void renderTask(T task, int count, Rectangle bounds)
+    {
         //add the task widget
         TaskWidget taskWidget = new TaskWidget(task);
-        taskWidget.setStyleName("task");
+
+        switch (count % 4) {
+        case 1:
+           taskWidget.setStyleName("task-orange");
+           break;
+        case 2:
+           taskWidget.setStyleName("task-blue");
+           break;
+        case 3:
+           taskWidget.setStyleName("task-purple");
+           break;
+        case 0:
+           taskWidget.setStyleName("task-green");
+        }
         taskWidget.addStyleDependentName(display.getProvidesTask().getStyle(task));
         taskWidget.getElement().getStyle().setPosition(Position.ABSOLUTE);
         taskWidget.getElement().getStyle().setWidth(bounds.getWidth(), Unit.PX);
@@ -236,10 +249,11 @@ public class GanttChartView<T> extends Composite implements TaskDisplayView<T> {
         if (display.getProvidesTask().getPercentComplete(task) > 0) {
             SimplePanel pctCompletePanel = new SimplePanel();
             pctCompletePanel.setStyleName("pctComplete");
-            pctCompletePanel.getElement().getStyle().setTop(bounds.getHeight() * .2, Unit.PX);
-            pctCompletePanel.getElement().getStyle().setBottom(bounds.getHeight() * .2, Unit.PX);
+            pctCompletePanel.getElement().getStyle().setTop(0, Unit.PX);
+            pctCompletePanel.getElement().getStyle().setBottom(0, Unit.PX);
             pctCompletePanel.getElement().getStyle().setLeft(0, Unit.PX);
-            pctCompletePanel.getElement().getStyle().setWidth(bounds.getWidth() * display.getProvidesTask().getPercentComplete(task) / 100, Unit.PX);
+            pctCompletePanel.getElement().getStyle().setWidth(
+                  bounds.getWidth() * display.getProvidesTask().getPercentComplete(task) / 100, Unit.PX);
             taskWidget.add(pctCompletePanel);
         }
 
@@ -299,11 +313,11 @@ public class GanttChartView<T> extends Composite implements TaskDisplayView<T> {
 
     @Override
     public void renderTaskLabel(T task, Rectangle bounds) {
-        Label taskLabel = new Label(display.getProvidesTask().getName(task));
-        taskLabel.setStyleName("taskLabel");
-        taskLabel.getElement().getStyle().setTop(bounds.getTop(), Unit.PX);
-        taskLabel.getElement().getStyle().setLeft(bounds.getLeft(), Unit.PX);
-        taskFlowPanel.add(taskLabel);
+//        Label taskLabel = new Label(display.getProvidesTask().getName(task));
+//        taskLabel.setStyleName("taskLabel");
+//        taskLabel.getElement().getStyle().setTop(bounds.getTop(), Unit.PX);
+//        taskLabel.getElement().getStyle().setLeft(bounds.getLeft(), Unit.PX);
+//        taskFlowPanel.add(taskLabel);
     }
 
     @Override

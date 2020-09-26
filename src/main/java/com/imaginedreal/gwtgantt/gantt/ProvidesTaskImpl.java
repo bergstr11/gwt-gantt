@@ -17,13 +17,13 @@
  */
 package com.imaginedreal.gwtgantt.gantt;
 
+import java.util.Date;
+import java.util.List;
+
 import com.imaginedreal.gwtgantt.model.DurationFormat;
 import com.imaginedreal.gwtgantt.model.Predecessor;
 import com.imaginedreal.gwtgantt.model.PredecessorType;
 import com.imaginedreal.gwtgantt.model.Task;
-
-import java.util.Date;
-import java.util.List;
 
 /**
  *
@@ -39,16 +39,6 @@ public class ProvidesTaskImpl implements ProvidesTask<Task> {
     @Override
     public String getName(Task item) {
         return item.getName();
-    }
-
-    @Override
-    public String getNotes(Task item) {
-        return item.getNotes();
-    }
-
-    @Override
-    public int getOrder(Task item) {
-        return item.getOrder();
     }
 
     @Override

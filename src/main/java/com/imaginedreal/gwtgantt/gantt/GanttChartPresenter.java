@@ -17,7 +17,9 @@
  */
 package com.imaginedreal.gwtgantt.gantt;
 
-import com.google.gwt.core.client.GWT;
+import java.util.Date;
+import java.util.List;
+
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.view.client.CellPreviewEvent.Handler;
@@ -26,10 +28,6 @@ import com.imaginedreal.gwtgantt.connector.CalculatorFactory;
 import com.imaginedreal.gwtgantt.geometry.Point;
 import com.imaginedreal.gwtgantt.geometry.Rectangle;
 import com.imaginedreal.gwtgantt.model.PredecessorType;
-import com.imaginedreal.gwtgantt.model.Task;
-
-import java.util.Date;
-import java.util.List;
 
 /**
  *
@@ -45,9 +43,9 @@ public class GanttChartPresenter<T> extends TaskDisplayPresenter<T> {
     protected static final int ROW2_WIDTH_OFFSET = 40;
     protected static final int ROW2_HEIGHT = 23;
     protected static final int ROW2_HEIGHT_OFFSET = 25;
-    protected static final int TASK_ROW_HEIGHT = 24;
-    protected static final int TASK_HEIGHT = 10;
-    protected static final int TASK_PADDING_TOP = 6;
+    protected static final int TASK_ROW_HEIGHT = 32;
+    protected static final int TASK_HEIGHT = 23;
+    protected static final int TASK_PADDING_TOP = 8;
     protected static final int MILESTONE_WIDTH = 16;
     protected static final int MILESTONE_PADDING_TOP = 4;
     protected static final int SUMMARY_HEIGHT = 7;
@@ -181,11 +179,13 @@ public class GanttChartPresenter<T> extends TaskDisplayPresenter<T> {
         int left = daysFromStart * ROW2_WIDTH_OFFSET;
         int width = daysInLength * ROW2_WIDTH_OFFSET - 4;
         int height = TASK_HEIGHT;
-        GWT.log("proj start: " + start + "  task start: "+provider.getStart(task) + "   daysFromDuration: "+daysFromStart);
+
+        // GWT.log("proj start: " + start + " task start: "+provider.getStart(task) + "
+        // daysFromDuration: "+daysFromStart);
 
         //render the task
         Rectangle taskBounds = new Rectangle(left, top, width, height);
-        view.renderTask(task, taskBounds);
+        view.renderTask(task, order, taskBounds);
 
         //render the label
         Rectangle labelBounds = new Rectangle(taskBounds.getRight(), top - 2, -1, -1);

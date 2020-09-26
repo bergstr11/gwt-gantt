@@ -3,7 +3,6 @@ package com.imaginedreal.gwtgantt.gantt;
 import java.util.Date;
 import java.util.List;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.imaginedreal.gwtgantt.DateUtil;
 import com.imaginedreal.gwtgantt.geometry.Rectangle;
@@ -91,11 +90,12 @@ public class GanttChartPresenterMonthImpl<T> extends GanttChartPresenter<T> {
         int width = daysInLength * UNIT_WIDTH-2;
         int height = TASK_HEIGHT;
         
-        GWT.log("proj start: " + start + "  task start: "+provider.getStart(task) + "   daysFromDuration: "+daysFromStart);
+        // GWT.log("proj start: " + start + " task start: "+provider.getStart(task) + "
+        // daysFromDuration: "+daysFromStart);
 
         //render the task
         Rectangle taskBounds = new Rectangle(left, top, width, height);
-        view.renderTask(task, taskBounds);
+        view.renderTask(task, order, taskBounds);
 
         //render the label
         Rectangle labelBounds = new Rectangle(taskBounds.getRight(), top - 2, -1, -1);
