@@ -23,6 +23,7 @@ import java.util.List;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.dom.client.Style.Unit;
+import com.google.gwt.event.dom.client.DropEvent;
 import com.google.gwt.event.dom.client.HasScrollHandlers;
 import com.google.gwt.event.dom.client.ScrollEvent;
 import com.google.gwt.event.dom.client.ScrollHandler;
@@ -148,28 +149,61 @@ public class GanttChart<T> extends ResizeComposite implements HasScrollHandlers,
       view.doScroll(x, y);
    }
 
-   public interface TaskHoverHandler<TS> extends EventHandler
+   public interface TaskDropHandler<TS> extends EventHandler
+   {
+      void onDrop(TS task, DropEvent event);
+   }
+
+   public interface TaskInteractionHandler<TS> extends EventHandler
    {
       void onStartHover(TS task, Event event);
 
       void onEndHover(TS task, Event event);
 
       void onClick(TS task, Event event);
+
+      void onDoubleClick(TS task, Event event);
    }
 
-   public static class TaskHoverEvent<TS> extends GwtEvent<TaskHoverHandler<TS>>
+   public static class TaskDropEvent<TS> extends GwtEvent<TaskDropHandler<TS>>
+   {
+      private final Type<TaskDropHandler<TS>> type;
+      private final TS task;
+      private final DropEvent event;
+
+      public TaskDropEvent(Type<TaskDropHandler<TS>> type, TS task, DropEvent event)
+      {
+         this.type = type;
+         this.task = task;
+         this.event = event;
+      }
+
+      @Override
+      public Type<TaskDropHandler<TS>> getAssociatedType()
+      {
+         return type;
+      }
+
+      @Override
+      protected void dispatch(TaskDropHandler<TS> handler)
+      {
+         handler.onDrop(task, event);
+      }
+   }
+
+   public static class TaskInteractionEvent<TS> extends GwtEvent<TaskInteractionHandler<TS>>
    {
       public enum WHICH
       {
-         IN, OUT, CLICK
+         IN, OUT, CLICK, DBLCLICK
       }
 
-      private final Type<TaskHoverHandler<TS>> type;
+      private final Type<TaskInteractionHandler<TS>> type;
       private final TS task;
       private final Event event;
       private final WHICH which;
 
-      public TaskHoverEvent(Type<TaskHoverHandler<TS>> type, TS task, Event event, WHICH which)
+      public TaskInteractionEvent(Type<TaskInteractionHandler<TS>> type, TS task, Event event, WHICH which)
       {
          this.type = type;
          this.task = task;
@@ -178,13 +212,13 @@ public class GanttChart<T> extends ResizeComposite implements HasScrollHandlers,
       }
 
       @Override
-      public Type<TaskHoverHandler<TS>> getAssociatedType()
+      public Type<TaskInteractionHandler<TS>> getAssociatedType()
       {
          return type;
       }
 
       @Override
-      protected void dispatch(TaskHoverHandler<TS> handler)
+      protected void dispatch(TaskInteractionHandler<TS> handler)
       {
          switch (which) {
          case IN:
@@ -195,33 +229,58 @@ public class GanttChart<T> extends ResizeComposite implements HasScrollHandlers,
             break;
          case CLICK:
             handler.onClick(task, event);
+            break;
+         case DBLCLICK:
+            handler.onDoubleClick(task, event);
          }
       }
    }
 
-   public final GwtEvent.Type<TaskHoverHandler<T>> taskOverEventType = new GwtEvent.Type<>();
+   public final GwtEvent.Type<TaskInteractionHandler<T>> taskInteractionEventType = new GwtEvent.Type<>();
+   public final GwtEvent.Type<TaskDropHandler<T>> taskDropEventType = new GwtEvent.Type<>();
 
-   public HandlerRegistration addTaskHoverHandler(TaskHoverHandler<T> handler)
+   public HandlerRegistration addTaskInteractionHandler(TaskInteractionHandler<T> handler)
    {
-      return addHandler(handler, taskOverEventType);
+      return addHandler(handler, taskInteractionEventType);
+   }
+
+   public HandlerRegistration addTaskDropHandler(TaskDropHandler<T> handler)
+   {
+      return addHandler(handler, taskDropEventType);
    }
 
    @Override
    public void fireTaskOutEvent(T task, Event event)
    {
-      super.fireEvent(new TaskHoverEvent<T>(taskOverEventType, task, event, TaskHoverEvent.WHICH.OUT));
+      super.fireEvent(
+            new TaskInteractionEvent<T>(taskInteractionEventType, task, event, TaskInteractionEvent.WHICH.OUT));
    }
 
    @Override
    public void fireTaskOverEvent(T task, Event event)
    {
-      super.fireEvent(new TaskHoverEvent<T>(taskOverEventType, task, event, TaskHoverEvent.WHICH.IN));
+      super.fireEvent(
+            new TaskInteractionEvent<T>(taskInteractionEventType, task, event, TaskInteractionEvent.WHICH.IN));
    }
 
    @Override
    public void fireTaskClickEvent(T task, Event event)
    {
-      super.fireEvent(new TaskHoverEvent<T>(taskOverEventType, task, event, TaskHoverEvent.WHICH.CLICK));
+      super.fireEvent(
+            new TaskInteractionEvent<T>(taskInteractionEventType, task, event, TaskInteractionEvent.WHICH.CLICK));
+   }
+
+   @Override
+   public void fireTaskDblClickEvent(T task, Event event)
+   {
+      super.fireEvent(
+            new TaskInteractionEvent<T>(taskInteractionEventType, task, event, TaskInteractionEvent.WHICH.DBLCLICK));
+   }
+
+   @Override
+   public void fireTaskDropEvent(T task, DropEvent event)
+   {
+      super.fireEvent(new TaskDropEvent<T>(taskDropEventType, task, event));
    }
 
    @Override

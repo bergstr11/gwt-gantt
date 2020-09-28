@@ -170,10 +170,8 @@ public class GanttChartPresenter<T> extends TaskDisplayPresenter<T> {
 
     protected void renderTask(T task, int order) {
 
-        int daysFromStart = DateUtil.differenceInDays(start,provider.getStart(task));//+1;
-        int daysInLength = DateUtil.differenceInDays(provider.getStart(task), provider.getFinish(task)) + 1;
-
-        daysInLength = Math.max(daysInLength, 1);
+       int daysFromStart = DateUtil.getStartOffsetDays(start, provider.getStart(task));
+       int daysInLength = DateUtil.getDisplayableDays(start, finish, provider.getStart(task), provider.getFinish(task));
 
         int top = TASK_ROW_HEIGHT * order + TASK_PADDING_TOP;//order * TASK_HEIGHT + ((order+1) * TASK_PADDING) + (order * TASK_PADDING);
         int left = daysFromStart * ROW2_WIDTH_OFFSET;
@@ -285,19 +283,14 @@ public class GanttChartPresenter<T> extends TaskDisplayPresenter<T> {
 
         Date adjustedStart = display.getStart();
 
-        //if the gantt chart's start date is null, let's set one automatically
-        if (display.getStart() == null) {
-            adjustedStart = new Date();
+        if (adjustedStart == null) {
+           if (values != null && !values.isEmpty()) {
+              adjustedStart = provider.getStart(values.get(0));
+           }
+           else {
+              adjustedStart = new Date();
+           }
         }
-
-        //if the first task in the gantt chart is before the gantt charts
-        // project start date ...
-        if (values != null && !values.isEmpty()
-                && provider.getStart(values.get(0)).before(adjustedStart)) {
-
-            adjustedStart = provider.getStart(values.get(0));
-        }
-
         adjustedStart = DateUtil.addDays(adjustedStart, -7);
         adjustedStart = DateUtil.getFirstDayOfWeek(adjustedStart);
         return DateUtil.reset(adjustedStart);
@@ -307,18 +300,14 @@ public class GanttChartPresenter<T> extends TaskDisplayPresenter<T> {
 
         Date adjustedFinish = display.getFinish();
 
-        //if the gantt chart's finish date is null, let's set one automatically
         if (adjustedFinish == null) {
-            adjustedFinish = new Date();
-            adjustedFinish = DateUtil.addDays(adjustedFinish, 7 * 12);
-        }
-
-        //if the last task in the gantt chart is after the gantt charts
-        // project finish date ...
-        if (values != null && !values.isEmpty() && provider.getFinish(values.get(
-                values.size() - 1)).after(adjustedFinish)) {
-
-            adjustedFinish = provider.getFinish(values.get(values.size() - 1));
+           if (values != null && !values.isEmpty()) {
+              adjustedFinish = provider.getFinish(values.get(values.size() - 1));
+           }
+           else {
+              adjustedFinish = new Date();
+              adjustedFinish = DateUtil.addDays(adjustedFinish, 7 * 12);
+           }
         }
 
         adjustedFinish = DateUtil.addDays(adjustedFinish, 7);

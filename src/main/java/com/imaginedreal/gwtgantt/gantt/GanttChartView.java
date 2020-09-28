@@ -24,8 +24,15 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Style.Overflow;
 import com.google.gwt.dom.client.Style.Position;
 import com.google.gwt.dom.client.Style.Unit;
+import com.google.gwt.event.dom.client.DragEnterEvent;
+import com.google.gwt.event.dom.client.DragEnterHandler;
+import com.google.gwt.event.dom.client.DragOverEvent;
+import com.google.gwt.event.dom.client.DragOverHandler;
+import com.google.gwt.event.dom.client.DropEvent;
+import com.google.gwt.event.dom.client.DropHandler;
 import com.google.gwt.event.dom.client.ScrollEvent;
 import com.google.gwt.event.dom.client.ScrollHandler;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.safehtml.client.SafeHtmlTemplates;
 import com.google.gwt.safehtml.client.SafeHtmlTemplates.Template;
 import com.google.gwt.safehtml.shared.SafeHtml;
@@ -74,7 +81,54 @@ public class GanttChartView<T> extends Composite implements TaskDisplayView<T>
         return false;
     }
 
+    private class DragDropSupport implements DragEnterHandler, DragOverHandler, DropHandler
+    {
+       private final TaskWidget widget;
+       private final T task;
 
+       private HandlerRegistration dragEnterRegistration;
+       private HandlerRegistration dragOverRegistration;
+       private HandlerRegistration dropRegistration;
+
+       @Override
+       public void onDragEnter(DragEnterEvent event)
+       {
+          GWT.log("ENTER "+widget.getOffsetWidth());
+          event.preventDefault();
+       }
+
+       @Override
+       public void onDragOver(DragOverEvent event)
+       {
+          event.preventDefault();
+       }
+
+       @Override
+       public void onDrop(DropEvent event)
+       {
+          event.preventDefault();
+
+          GWT.log("DROP");
+          display.fireTaskDropEvent(task, event);
+       }
+
+       public DragDropSupport(TaskWidget widget, T task)
+       {
+          this.widget = widget;
+          this.task = task;
+
+          dragEnterRegistration = widget.addDomHandler(this, DragEnterEvent.getType());
+          dragOverRegistration = widget.addDomHandler(this, DragOverEvent.getType());
+          dropRegistration = widget.addDomHandler(this, DropEvent.getType());
+       }
+
+       public void removeHandlers()
+       {
+          dragEnterRegistration.removeHandler();
+          dragOverRegistration.removeHandler();
+          dropRegistration.removeHandler();
+       }
+    }
 
     interface GanttChartViewUiBinder extends UiBinder<Widget, GanttChartView> {
     }
@@ -99,13 +153,10 @@ public class GanttChartView<T> extends Composite implements TaskDisplayView<T>
 
                 	if(display.getSelectionModel()!=null)
                 		display.getSelectionModel().setSelected(task, true);
-                	
-                	
                     break;
 
                 case Event.ONDBLCLICK:
-//                    view.onItemDoubleClicked(task);
-                	
+                   display.fireTaskDblClickEvent(task, event);
                     break;
 
                 case Event.ONKEYDOWN:
@@ -163,8 +214,8 @@ public class GanttChartView<T> extends Composite implements TaskDisplayView<T>
     }
 
     public void init() {
-        taskScrollPanel.getElement().getStyle().setPosition(Position.ABSOLUTE);
-        taskScrollPanel.getElement().getStyle().setOverflow(Overflow.SCROLL);
+       taskScrollPanel.getElement().getStyle().setPosition(Position.ABSOLUTE);
+       taskScrollPanel.getElement().getStyle().setOverflow(Overflow.SCROLL);
 
         //initialize the SVG panel
         initSVG();
@@ -221,6 +272,7 @@ public class GanttChartView<T> extends Composite implements TaskDisplayView<T>
     {
         //add the task widget
         TaskWidget taskWidget = new TaskWidget(task);
+        new DragDropSupport(taskWidget, task);
 
         switch (count % 4) {
         case 1:
@@ -498,8 +550,8 @@ public class GanttChartView<T> extends Composite implements TaskDisplayView<T>
     @Override
     public void doScroll(int x, int y) {
 
-        taskScrollPanel.setHorizontalScrollPosition(x);
-        taskScrollPanel.setScrollPosition(y);
+       taskScrollPanel.setHorizontalScrollPosition(x);
+       taskScrollPanel.setVerticalScrollPosition(y);
         
         int hscroll = x * -1;
 

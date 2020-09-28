@@ -91,12 +91,31 @@ public class DateUtil {
 			int startDateOffset = -(startDate.getTimezoneOffset() * 60 * 1000);
 			long startDateInstant = startDate.getTime() + startDateOffset;
 			double differenceDouble = (double) Math.abs(endDateInstant - startDateInstant) / (double) MILLIS_IN_A_DAY;
-         // GWT.log(" differenceDouble: "+differenceDouble);
 			differenceDouble = Math.max(1.0D, differenceDouble);
 			difference = (int) Math.round(differenceDouble);//added math.ceil .. then changed to floor... shit, which one???
 		}
 		return difference;
 	}
+
+   public static int getStartOffsetDays(Date displayStart, Date taskStart)
+   {
+      if (taskStart.before(displayStart)) {
+         return 0;
+      }
+      else {
+         double diff = (taskStart.getTime() - displayStart.getTime()) / (double) MILLIS_IN_A_DAY;
+         return (int) Math.round(diff);
+      }
+   }
+
+   public static int getDisplayableDays(Date displayStart, Date displayEnd, Date taskStart, Date taskEnd)
+   {
+      Date start = taskStart.after(displayStart) ? taskStart : displayStart;
+      Date end = taskEnd.before(displayEnd) ? taskEnd : displayEnd;
+
+      double diff = (end.getTime() - start.getTime()) / (double) MILLIS_IN_A_DAY;
+      return (int) Math.floor(diff);
+   }
 
 	/**
 	 * Indicates whether two dates are on the same date by comparing their day,

@@ -19,6 +19,7 @@ package com.imaginedreal.gwtgantt.gantt;
 
 import java.util.Date;
 
+import com.google.gwt.event.dom.client.DropEvent;
 import com.google.gwt.user.client.Event;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.view.client.HasData;
@@ -79,17 +80,6 @@ public interface TaskDisplay<T> extends HasData<T>, IsWidget {
      */
     public ProvidesTask<T> getProvidesTask();
     
-//    public boolean isAttached();
-
-//	public void fireItemClickEvent(T item, Point point);
-//
-//	public void fireItemDoubleClickEvent(T item, Point point);
-//
-//        public void fireItemEnterEvent(T item, Rectange bounds);
-//
-//        public void fireItemExitEvent(T item, Rectange bounds);
-
-
   /**
    * Get the {@link SelectionModel} used by this {@link HasData}.
    *
@@ -113,4 +103,8 @@ public interface TaskDisplay<T> extends HasData<T>, IsWidget {
     public void fireTaskOverEvent(T task, Event event);
 
     public void fireTaskClickEvent(T task, Event event);
+
+    public void fireTaskDblClickEvent(T task, Event event);
+
+    public void fireTaskDropEvent(T task, DropEvent event);
 }
