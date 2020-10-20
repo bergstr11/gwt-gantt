@@ -81,7 +81,7 @@ public class GanttChartView<T> extends Composite implements TaskDisplayView<T>
         return false;
     }
 
-    private class DragDropSupport implements DragEnterHandler, DragOverHandler, DropHandler
+    public class DragDropSupport implements DragEnterHandler, DragOverHandler, DropHandler
     {
        private final TaskWidget widget;
        private final T task;
@@ -93,7 +93,6 @@ public class GanttChartView<T> extends Composite implements TaskDisplayView<T>
        @Override
        public void onDragEnter(DragEnterEvent event)
        {
-          GWT.log("ENTER "+widget.getOffsetWidth());
           event.preventDefault();
        }
 
@@ -107,8 +106,6 @@ public class GanttChartView<T> extends Composite implements TaskDisplayView<T>
        public void onDrop(DropEvent event)
        {
           event.preventDefault();
-
-          GWT.log("DROP");
           display.fireTaskDropEvent(task, event);
        }
 
